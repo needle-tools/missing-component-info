@@ -153,6 +153,7 @@ namespace Needle.Tiny
 			string[] lines = null;
 			if (PrefabStageUtility.GetCurrentPrefabStage())
 			{
+				// TODO: render in prefab stage
 			}
 			else
 			{
@@ -162,6 +163,7 @@ namespace Needle.Tiny
 
 			if (lines != null)
 			{
+				// TODO: this is the naive version, a component could be multiple times on an object and we also need to check for the gameobject id first and find the correct component etc
 				var foundStart = false;
 				foreach (var line in lines)
 				{
