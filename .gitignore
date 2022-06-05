@@ -5,3 +5,4 @@ projects/**/\[Bb]uilds
 projects/**/*.csproj
 projects/**/*.sln
 projects/**/Logs
+projects/**/.idea
