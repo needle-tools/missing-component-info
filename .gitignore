@@ -1,0 +1,7 @@
+﻿projects/**/Library
+projects/**/Temp
+projects/**/obj
+projects/**/\[Bb]uilds
+projects/**/*.csproj
+projects/**/*.sln
+projects/**/Logs
