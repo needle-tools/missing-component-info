@@ -22,7 +22,7 @@ namespace Needle.Tiny
 		{
 			UpdateInspector();
 		}
-
+		
 		private const string InjectionClassName = "__needle_missingcomponent_helper";
 
 		private static void UpdateInspector()
@@ -55,23 +55,24 @@ namespace Needle.Tiny
 
 		private static void OnInject(Editor editor, EditorElement element)
 		{
+			// capture script type and store it in the serialized property
 			var serializedObject = editor.serializedObject;
 			var prop = serializedObject.FindProperty("m_EditorClassIdentifier");
 			if (editor.target)
 			{
 				if (prop != null)
 				{
-					AssetDatabase.TryGetGUIDAndLocalFileIdentifier(editor.target, out var guid, out long id);
-					var identifier = editor.target.GetType().AssemblyQualifiedName + " / " + guid + "@" + id;
+					var identifier = editor.target.GetType().AssemblyQualifiedName;
 					if (identifier != prop.stringValue)
 					{
-						prop.stringValue = editor.target.GetType().AssemblyQualifiedName;
+						prop.stringValue = identifier;
 						serializedObject.ApplyModifiedProperties();
 					}
 				}
 				return;
 			}
 			
+			// render missing script info
 			if(prop != null)
 			{
 				if (string.IsNullOrEmpty(prop.stringValue)) return;
