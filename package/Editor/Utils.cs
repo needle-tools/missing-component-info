@@ -67,6 +67,12 @@ namespace Needle.ComponentExtension
 			}
 		}
 
+		internal static bool CanShowProperties(Object obj)
+		{
+			var isInPrefab = IsInPrefabState(out _);
+			return isInPrefab || !PrefabUtility.IsPartOfPrefabInstance(obj);
+		}
+
 		private static bool IsInPrefabState(out string path)
 		{
 			path = null;

@@ -109,13 +109,14 @@ namespace Needle.ComponentExtension
 				var showMembers = false;
 				var triedCollectingMembers = false;
 				List<MemberInfo> members = default;
-				
+				const int offsetLeft = 16;
+
 				container.onGUIHandler += OnGUI;
+
 				void OnGUI()
 				{
 					try
 					{
-						const int offsetLeft = 16;
 						// if (!prop.isValid) return; 
 						GUILayout.Space(-5);
 						using (new GUILayout.HorizontalScope())
@@ -127,51 +128,66 @@ namespace Needle.ComponentExtension
 							GUILayout.Space(3);
 						}
 
-						if (!triedCollectingMembers)
-						{
-							triedCollectingMembers = true;
-							Utils.CollectMembersInfo(editor.target, serializedId, serializedObject, out members);
-						}
-						if (members != null && members.Count > 0)
-						{
-							using (new GUILayout.HorizontalScope())
-							{
-								GUILayout.Space(offsetLeft);
-								showMembers = EditorGUILayout.Foldout(showMembers, "Serialized Properties");
-							}
-							if (showMembers)
-							{
-								using (new EditorGUI.DisabledScope(true))
-								{
-									EditorGUI.indentLevel += 1;
-									foreach (var member in members)
-									{
-										using (new GUILayout.HorizontalScope())
-										{
-											GUILayout.Space(offsetLeft);
-											try
-											{
-												if (member.Property != null)
-													EditorGUILayout.PropertyField(member.Property, true);
-												else EditorGUILayout.LabelField(member.Name, member.Value);
-											}
-											catch (NullReferenceException)
-											{
-												// ignore
-												EditorGUILayout.LabelField(member.Name, "Could not display");
-											}
-										}
-									}
-									EditorGUI.indentLevel -= 1;
-								}
-							}
-						}
+						if (Utils.CanShowProperties(editor.target)) 
+							RenderSerializedProperties();
 						GUILayout.Space(5);
 					}
 					catch (Exception ex)
 					{
 						Debug.LogException(ex);
 						container.onGUIHandler -= OnGUI;
+					}
+				}
+
+				void RenderSerializedProperties()
+				{
+					using (new GUILayout.HorizontalScope())
+					{
+						GUILayout.Space(offsetLeft);
+
+						if (triedCollectingMembers && (members == null || members.Count <= 0))
+						{
+							using (new EditorGUI.DisabledScope(true))
+								EditorGUILayout.LabelField("No serialized properties found");
+						}
+						else
+							showMembers = EditorGUILayout.Foldout(showMembers, "Serialized Properties");
+					}
+
+					if (showMembers)
+					{
+						if (!triedCollectingMembers)
+						{
+							triedCollectingMembers = true;
+							Utils.CollectMembersInfo(editor.target, serializedId, serializedObject, out members);
+						}
+						;
+						if (members != null && members.Count > 0)
+						{
+							EditorGUI.indentLevel += 1;
+							using (new EditorGUI.DisabledScope(true))
+							{
+								foreach (var member in members)
+								{
+									using (new GUILayout.HorizontalScope())
+									{
+										GUILayout.Space(offsetLeft);
+										try
+										{
+											if (member.Property != null)
+												EditorGUILayout.PropertyField(member.Property, true);
+											else EditorGUILayout.LabelField(member.Name, member.Value);
+										}
+										catch (NullReferenceException)
+										{
+											// ignore
+											EditorGUILayout.LabelField(member.Name, "Could not display");
+										}
+									}
+								}
+							}
+							EditorGUI.indentLevel -= 1;
+						}
 					}
 				}
 			}

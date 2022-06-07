@@ -2,7 +2,10 @@
 
 Serializes and renders missing component info (if available)
 
-![alt text](Documentation~/missing_component.png "Missing component type info being rendered")
+![Missing component with type info](Documentation~/missing_component.png "Missing component type info being rendered") 
+
+Displaying serialized properties  
+![Missing component with type info and serialized properties](Documentation~/missing_component_properties.png "Missing component type info being rendered including serialized properties")
 
 ---
 ## Contact ✒️
