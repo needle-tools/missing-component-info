@@ -1,6 +1,6 @@
 # Unity - Display missing component type info
 
-This package must be installed to your project BEFORE you have missing scripts. Otherwise no type information is serialized and therefore not be displayed later when you have missing scripts in a prefab or your scene.
+This package must be installed to your project BEFORE you have missing scripts. Otherwise no type information is serialized and can therefore not be displayed later when you have missing scripts in a prefab or scene.
 
 Serializes and renders missing component info (if available)
 
