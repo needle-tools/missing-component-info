@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEditor;
+using UnityEditor.ShortcutManagement;
 using UnityEditor.UIElements;
+using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -75,9 +78,10 @@ namespace Needle.ComponentExtension
 					if (identifier != null && !prop.stringValue.StartsWith(identifier))
 					{
 						identifier = string.Join(",", identifier.Split(',').Take(2));
-						prop.stringValue = identifier;
+						var id = GlobalObjectId.GetGlobalObjectIdSlow(editor.target);
+						prop.stringValue = $"{identifier} $ " + id;
 						serializedObject.ApplyModifiedProperties();
-						EditorUtility.SetDirty(serializedObject.targetObject);
+						EditorUtility.SetDirty(editor.target);
 					}
 				}
 				return;
@@ -93,13 +97,20 @@ namespace Needle.ComponentExtension
 					style.richText = true;
 				}
 
-				Utils.CollectMembersInfo("", prop.stringValue, serializedObject, out var members);
 				if (!icon) icon = AssetDatabase.LoadAssetAtPath<Texture>(AssetDatabase.GUIDToAssetPath("06824066cef43c446a81e7fc2ef35664"));
-				var message = "<color=#ffcc11><b>Missing Type</b></color>: " + prop.stringValue;
+				var values = prop.stringValue.Split('$');
+				var message = "<color=#ffcc11><b>Missing Type</b></color>: " + values[0];
 				var container = new IMGUIContainer();
 				element.Add(container);
-				container.onGUIHandler += OnGUI;
 
+				var serializedId = values.Length > 1 ? values[1] : string.Empty;
+
+
+				var showMembers = false;
+				var triedCollectingMembers = false;
+				List<MemberInfo> members = default;
+				
+				container.onGUIHandler += OnGUI;
 				void OnGUI()
 				{
 					try
@@ -115,26 +126,51 @@ namespace Needle.ComponentExtension
 								style);
 							GUILayout.Space(3);
 						}
-						if (members != null)
+
+						if (!triedCollectingMembers)
+						{
+							triedCollectingMembers = true;
+							Utils.CollectMembersInfo(editor.target, serializedId, serializedObject, out members);
+						}
+						if (members != null && members.Count > 0)
 						{
 							using (new GUILayout.HorizontalScope())
 							{
+								GUILayout.Space(offsetLeft);
+								showMembers = EditorGUILayout.Foldout(showMembers, "Serialized Properties");
+							}
+							if (showMembers)
+							{
 								using (new EditorGUI.DisabledScope(true))
 								{
-									GUILayout.Space(offsetLeft);
+									EditorGUI.indentLevel += 1;
 									foreach (var member in members)
 									{
-										if (member.Property != null)
-											EditorGUILayout.PropertyField(member.Property, true);
-										else EditorGUILayout.LabelField(member.Name, member.Value);
+										using (new GUILayout.HorizontalScope())
+										{
+											GUILayout.Space(offsetLeft);
+											try
+											{
+												if (member.Property != null)
+													EditorGUILayout.PropertyField(member.Property, true);
+												else EditorGUILayout.LabelField(member.Name, member.Value);
+											}
+											catch (NullReferenceException)
+											{
+												// ignore
+												EditorGUILayout.LabelField(member.Name, "Could not display");
+											}
+										}
 									}
+									EditorGUI.indentLevel -= 1;
 								}
 							}
 						}
 						GUILayout.Space(5);
 					}
-					catch (Exception)
+					catch (Exception ex)
 					{
+						Debug.LogException(ex);
 						container.onGUIHandler -= OnGUI;
 					}
 				}

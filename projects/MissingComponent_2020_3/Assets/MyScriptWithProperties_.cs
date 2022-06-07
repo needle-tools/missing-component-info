@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,16 +6,15 @@ using UnityEngine;
 public class MyScriptWithProperties : MonoBehaviour
 {
     public float MyFloatValue = 42;
+    public string MyText = "Hello";
+    public bool MyBool;
+    public MySerializedClass MyClass;
+    public List<int> MyList;
     
-    // Start is called before the first frame update
-    void Start()
+    [Serializable]
+    public class MySerializedClass
     {
-        
+        public bool MyBool;
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    
 }

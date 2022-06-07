@@ -107,5 +107,5 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 90bf983e5d88dae48874eff973b5a214, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: MyScriptWithProperties, Assembly-CSharp
+  m_EditorClassIdentifier: MyScriptWithProperties, Assembly-CSharp $ GlobalObjectId_V1-2-00000000000000000000000000000000-2497590216853075993-0
   MyFloatValue: 42
