@@ -5,6 +5,12 @@ This package must be installed to your project BEFORE you have missing scripts. 
 ![Missing component with type info and serialized properties](Documentation~/missing_component_properties.png "Missing component type info being rendered including serialized properties")
 
 ## Installation 💾
+
+### Use Needle Installer 🚀
+1. [Click here](https://package-installer.glitch.me/v1/installer/OpenUPM/com.needle.missing-component-info?registry=https://package.openupm.com) to download a Needle installer .unitypackage.   
+2. Drop it into your project to install this package.  
+3. That's it 
+
 <details>
 <summary>Add from OpenUPM <em>| via scoped registry, recommended</em></summary>
 
