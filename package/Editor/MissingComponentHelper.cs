@@ -1,21 +1,15 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UnityEditor;
-using UnityEditor.Experimental.SceneManagement;
-using UnityEditor.Scripting;
-using UnityEditor.SearchService;
 using UnityEditor.UIElements;
+using UnityEditorInternal;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
-using UnityObject = UnityEngine.Object;
-using RefId = System.Int64;
 
-namespace Needle.Tiny
+// ReSharper disable CheckNamespace
+
+namespace Needle.ComponentExtension
 {
 	internal static class MissingComponentHelper
 	{
@@ -23,15 +17,20 @@ namespace Needle.Tiny
 		private static async void Init()
 		{
 			EditorApplication.hierarchyChanged += UpdateInspector;
-			Selection.selectionChanged += OnSelectionChanged;
-			await Task.Delay(100);
+			Selection.selectionChanged += UpdateInspector;
+			EditorApplication.focusChanged += OnFocusChanged;
+			EditorApplication.RequestRepaintAllViews();
+			do await Task.Delay(1000);
+			while (EditorApplication.isCompiling || EditorApplication.isUpdating);
 			UpdateInspector();
 		}
 
-		private static void OnSelectionChanged()
+		private static void OnFocusChanged(bool obj)
 		{
-			UpdateInspector();
+			if (obj)
+				UpdateInspector();
 		}
+
 
 		private const string InjectionClassName = "__needle_missingcomponent_helper";
 
@@ -62,6 +61,7 @@ namespace Needle.Tiny
 		}
 
 		private static GUIStyle style;
+		private static Texture icon;
 
 		private static void OnInject(Editor editor, EditorElement element)
 		{
@@ -94,8 +94,9 @@ namespace Needle.Tiny
 					style.richText = true;
 				}
 
-				CollectMembersInfo("", prop.stringValue, serializedObject, out var members);
-
+				Utils.CollectMembersInfo("", prop.stringValue, serializedObject, out var members);
+				if (!icon)
+					icon = AssetDatabase.LoadAssetAtPath<Texture>(AssetDatabase.GUIDToAssetPath("06824066cef43c446a81e7fc2ef35664"));
 				var container = new IMGUIContainer();
 				element.Add(container);
 				container.onGUIHandler += OnGUI;
@@ -105,12 +106,15 @@ namespace Needle.Tiny
 					try
 					{
 						const int offsetLeft = 16;
-						// if (!prop.isValid) return;
+
+						// if (!prop.isValid) return; 
+						GUILayout.Space(-5);
 						using (new GUILayout.HorizontalScope())
 						{
 							GUILayout.Space(offsetLeft);
+							var message = "<color=#ffcc11><b>Missing Type</b></color>: " + prop.stringValue;
 							EditorGUILayout.LabelField(
-								EditorGUIUtility.TrTextContentWithIcon("<color=#dddd44><b>Missing Type</b></color>: " + prop.stringValue, MessageType.Info),
+								EditorGUIUtility.TrTextContentWithIcon(message, "fsdfsd", icon),
 								style);
 							GUILayout.Space(3);
 						}
@@ -135,52 +139,6 @@ namespace Needle.Tiny
 					catch (Exception)
 					{
 						container.onGUIHandler -= OnGUI;
-					}
-				}
-			}
-		}
-
-		private class MemberInfo
-		{
-			public string Name;
-			public string Value;
-			public SerializedProperty Property;
-		}
-
-		private static void CollectMembersInfo(string id, string identifier, SerializedObject obj, out List<MemberInfo> members)
-		{
-			members = null;
-			string[] lines = null;
-			if (PrefabStageUtility.GetCurrentPrefabStage())
-			{
-				// TODO: render in prefab stage
-			}
-			else
-			{
-				var scene = SceneManager.GetActiveScene();
-				lines = File.ReadAllLines(scene.path);
-			}
-
-			if (lines != null)
-			{
-				// TODO: this is the naive version, a component could be multiple times on an object and we also need to check for the gameobject id first and find the correct component etc
-				var foundStart = false;
-				foreach (var line in lines)
-				{
-					if (foundStart && line.StartsWith("---")) break;
-					if (foundStart)
-					{
-						members ??= new List<MemberInfo>();
-						var member = new MemberInfo();
-						members.Add(member);
-						var values = line.Split(':');
-						member.Name = values[0].Trim();
-						member.Value = values[1].Trim();
-						member.Property = obj.FindProperty(member.Name);
-					}
-					else if (line.Contains(identifier))
-					{
-						foundStart = true;
 					}
 				}
 			}
