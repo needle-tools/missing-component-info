@@ -3,7 +3,7 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-#if UNITY_2021_3_OR_NEWER
+#if UNITY_2021_3_OR_NEWER || UNITY_2022_1_OR_NEWER
 using UnityEditor.SceneManagement; // PrefabStageUtility
 #else 
 using UnityEditor.Experimental.SceneManagement; // PrefabStageUtility
