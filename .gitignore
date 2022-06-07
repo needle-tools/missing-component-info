@@ -8,3 +8,4 @@ projects/**/Logs
 projects/**/.idea
 projects/**/*.csproj.DotSettings
 projects/**/builds
+projects/**/UserSettings
