@@ -2,7 +2,7 @@
 
 Serializes and renders missing component info (if available)
 
-![alt text](Documentation~/missing_component.png "Missing component type info being rendered")
+![alt text](package/Documentation~/missing_component.png "Missing component type info being rendered")
 
 ---
 ## Contact ✒️
