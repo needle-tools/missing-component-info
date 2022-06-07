@@ -7,3 +7,4 @@ projects/**/*.sln
 projects/**/Logs
 projects/**/.idea
 projects/**/*.csproj.DotSettings
+projects/**/builds

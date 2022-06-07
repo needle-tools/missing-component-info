@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEditor.UIElements;
-using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -95,8 +94,7 @@ namespace Needle.ComponentExtension
 				}
 
 				Utils.CollectMembersInfo("", prop.stringValue, serializedObject, out var members);
-				if (!icon)
-					icon = AssetDatabase.LoadAssetAtPath<Texture>(AssetDatabase.GUIDToAssetPath("06824066cef43c446a81e7fc2ef35664"));
+				if (!icon) icon = AssetDatabase.LoadAssetAtPath<Texture>(AssetDatabase.GUIDToAssetPath("06824066cef43c446a81e7fc2ef35664"));
 				var container = new IMGUIContainer();
 				element.Add(container);
 				container.onGUIHandler += OnGUI;
@@ -106,7 +104,6 @@ namespace Needle.ComponentExtension
 					try
 					{
 						const int offsetLeft = 16;
-
 						// if (!prop.isValid) return; 
 						GUILayout.Space(-5);
 						using (new GUILayout.HorizontalScope())
@@ -114,7 +111,7 @@ namespace Needle.ComponentExtension
 							GUILayout.Space(offsetLeft);
 							var message = "<color=#ffcc11><b>Missing Type</b></color>: " + prop.stringValue;
 							EditorGUILayout.LabelField(
-								EditorGUIUtility.TrTextContentWithIcon(message, "fsdfsd", icon),
+								EditorGUIUtility.TrTextContentWithIcon(message, icon),
 								style);
 							GUILayout.Space(3);
 						}
