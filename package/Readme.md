@@ -8,7 +8,7 @@ This package must be installed to your project BEFORE you have missing scripts. 
 
 ### Use Needle Installer 🚀
 1. [Click here](https://package-installer.glitch.me/v1/installer/OpenUPM/com.needle.missing-component-info?registry=https://package.openupm.com) to download a Needle installer .unitypackage.   
-2. Drop it into your project to install this package from [OpenUPM](https://openupm.com)  
+2. Drop it into your project to install this package from [OpenUPM](https://openupm.com/packages/com.needle.missing-component-info/)  
 3. That's it 
 
 <details>
