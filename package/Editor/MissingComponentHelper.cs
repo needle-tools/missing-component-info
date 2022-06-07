@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEditor;
-using UnityEditor.ShortcutManagement;
 using UnityEditor.UIElements;
-using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -20,18 +18,16 @@ namespace Needle.ComponentExtension
 		{
 			EditorApplication.hierarchyChanged += UpdateInspector;
 			Selection.selectionChanged += UpdateInspector;
-			EditorApplication.focusChanged += OnFocusChanged;
-			EditorApplication.RequestRepaintAllViews();
 			do await Task.Delay(1000);
 			while (EditorApplication.isCompiling || EditorApplication.isUpdating);
 			UpdateInspector();
 		}
 
-		private static void OnFocusChanged(bool obj)
-		{
-			if (obj)
-				UpdateInspector();
-		}
+		// private static void OnFocusChanged(bool obj)
+		// {
+		// 	if (obj)
+		// 		UpdateInspector();
+		// }
 
 
 		private const string InjectionClassName = "__needle_missingcomponent_helper";
