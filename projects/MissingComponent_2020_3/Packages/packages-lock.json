@@ -6,6 +6,12 @@
       "source": "local",
       "dependencies": {}
     },
+    "com.needle.missing-component-info-shared-assets": {
+      "version": "file:../../shared",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
+    },
     "com.unity.collab-proxy": {
       "version": "1.15.15",
       "depth": 0,

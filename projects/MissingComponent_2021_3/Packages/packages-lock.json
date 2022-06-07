@@ -1,5 +1,17 @@
 {
   "dependencies": {
+    "com.needle.missing-component-info": {
+      "version": "file:../../../package",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
+    },
+    "com.needle.missing-component-info-shared-assets": {
+      "version": "file:../../shared",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
+    },
     "com.unity.collab-proxy": {
       "version": "1.15.15",
       "depth": 0,
@@ -100,12 +112,6 @@
         "com.unity.modules.jsonserialize": "1.0.0"
       },
       "url": "https://packages.unity.com"
-    },
-    "needle.missing-component-info": {
-      "version": "file:../../../package",
-      "depth": 0,
-      "source": "local",
-      "dependencies": {}
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",
