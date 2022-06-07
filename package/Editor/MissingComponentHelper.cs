@@ -95,6 +95,7 @@ namespace Needle.ComponentExtension
 
 				Utils.CollectMembersInfo("", prop.stringValue, serializedObject, out var members);
 				if (!icon) icon = AssetDatabase.LoadAssetAtPath<Texture>(AssetDatabase.GUIDToAssetPath("06824066cef43c446a81e7fc2ef35664"));
+				var message = "<color=#ffcc11><b>Missing Type</b></color>: " + prop.stringValue;
 				var container = new IMGUIContainer();
 				element.Add(container);
 				container.onGUIHandler += OnGUI;
@@ -109,7 +110,6 @@ namespace Needle.ComponentExtension
 						using (new GUILayout.HorizontalScope())
 						{
 							GUILayout.Space(offsetLeft);
-							var message = "<color=#ffcc11><b>Missing Type</b></color>: " + prop.stringValue;
 							EditorGUILayout.LabelField(
 								EditorGUIUtility.TrTextContentWithIcon(message, icon),
 								style);
