@@ -35,9 +35,9 @@ namespace Needle.ComponentExtension
 		private static void UpdateInspector()
 		{
 			var openEditors = ActiveEditorTracker.sharedTracker.activeEditors;
+			var inspectors = InspectorWindow.GetInspectors();
 			foreach (var ed in openEditors)
 			{
-				var inspectors = InspectorWindow.GetInspectors();
 				foreach (var ins in inspectors)
 				{
 					ins.rootVisualElement.Query<EditorElement>().ForEach(editorElement =>
