@@ -1,5 +1,22 @@
 {
-  "name": "com.needle.missing-component-info",
   "displayName": "Needle Missing Component Info",
-  "version": "1.1.2"
+  "name": "com.needle.missing-component-info",
+  "version": "1.1.3",
+  "description": "Utility that helps to reconnect when scripts/components become missing. Keeps type information per component around and can show serialized data for missing components.",
+  "keywords": [
+    "Editor",
+    "Serialization",
+    "Helper"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/needle-tools/missing-component-info"
+  },
+  "author": {
+    "name": "Needle",
+    "email": "hi@needle.tools",
+    "url": "https://needle.tools"
+  },
+  "category": "Tools",
+  "type": "tool"
 }
