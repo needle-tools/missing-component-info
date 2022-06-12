@@ -9,3 +9,4 @@ projects/**/.idea
 projects/**/*.csproj.DotSettings
 projects/**/builds
 projects/**/UserSettings
+projects/**/RiderScriptEditorPersistedState.asset

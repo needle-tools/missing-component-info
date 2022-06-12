@@ -123,16 +123,17 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1001 &1331982722
+--- !u!1001 &157868712
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 2
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 7034211870898048076, guid: b77847a491b7bee4280f26b07259c8ff, type: 3}
       propertyPath: m_Name
-      value: PrefabWithMissingComponent
+      value: PrefabWithMissingComponent (1)
       objectReference: {fileID: 0}
     - target: {fileID: 8876352013236570305, guid: b77847a491b7bee4280f26b07259c8ff, type: 3}
       propertyPath: m_RootOrder
@@ -179,6 +180,7 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: b77847a491b7bee4280f26b07259c8ff, type: 3}
 --- !u!1 &1878741849
 GameObject:
@@ -222,6 +224,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0

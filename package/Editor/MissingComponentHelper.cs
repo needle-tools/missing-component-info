@@ -6,6 +6,7 @@ using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
 // ReSharper disable CheckNamespace
 
@@ -61,6 +62,8 @@ namespace Needle.ComponentExtension
 		private static GUIStyle style;
 		private static Texture icon;
 
+		private static readonly Dictionary<string, List<ScriptCandidate>> candidatesPerType = new Dictionary<string, List<ScriptCandidate>>();
+
 		private static void OnInject(Editor editor, EditorElement element)
 		{
 			// capture script type and store it in the serialized property
@@ -95,19 +98,18 @@ namespace Needle.ComponentExtension
 
 				if (!icon) icon = AssetDatabase.LoadAssetAtPath<Texture>(AssetDatabase.GUIDToAssetPath("06824066cef43c446a81e7fc2ef35664"));
 				var values = prop.stringValue.Split('$');
-				var message = "<color=#ffcc11><b>Missing Type</b></color>: " + values[0];
+				var typeInfo = values[0];
+				var message = "<color=#ffcc11><b>Missing Type</b></color>: " + typeInfo;
 				var container = new IMGUIContainer();
 				element.Add(container);
 
 				var serializedId = values.Length > 1 ? values[1] : string.Empty;
-
 
 				var showMembers = false;
 				var triedCollectingMembers = false;
 				List<MemberInfo> members = default;
 				const int offsetLeft = 16;
 
-				container.onGUIHandler += OnGUI;
 
 				void OnGUI()
 				{
@@ -124,9 +126,17 @@ namespace Needle.ComponentExtension
 							GUILayout.Space(3);
 						}
 
-						if (Utils.CanShowProperties(editor.target)) 
+						if (Utils.CanShowProperties(editor.target))
 							RenderSerializedProperties();
+						
 						GUILayout.Space(5);
+						// using (new GUILayout.HorizontalScope())
+						// {
+						// 	GUILayout.Space(offsetLeft);
+						// 	EditorGUILayout.LabelField("Experimental", EditorStyles.boldLabel);
+						// }
+						RenderCandidates();
+						GUILayout.Space(8);
 					}
 					catch (Exception ex)
 					{
@@ -186,6 +196,67 @@ namespace Needle.ComponentExtension
 						}
 					}
 				}
+
+
+				var didSearchCandidates = false;
+				var isExpanded = new Func<bool>(() => SessionState.GetBool("ShowCandidates_" + typeInfo, false));
+				var setExpanded = new Action<bool>(s => SessionState.SetBool("ShowCandidates_" + typeInfo, s));
+				List<ScriptCandidate> candidates = default;
+
+				void RenderCandidates()
+				{
+					try
+					{
+						using (new GUILayout.HorizontalScope())
+						{
+							GUILayout.Space(offsetLeft);
+							var prev = isExpanded();
+							var show = EditorGUILayout.Foldout(prev, new GUIContent("Candidates (experimental)", "When opened it attempts to find similar types in relevant assemblies"));
+							if (prev != show)
+								setExpanded(show);
+							if (!show) return;
+						}
+
+						if (!didSearchCandidates)
+						{
+							didSearchCandidates = true;
+
+							if (!candidatesPerType.TryGetValue(typeInfo, out candidates))
+								Utils.TryFindCandidatesInAssembly(typeInfo, out candidates);
+						}
+
+						if (candidates != null && candidates.Count > 0)
+						{
+							EditorGUI.indentLevel += 1;
+							foreach (var c in candidates)
+							{
+								using (new GUILayout.HorizontalScope())
+								{
+									GUILayout.Space(offsetLeft);
+									// using (new GUIColorScope(Color.Lerp(Color.white, Color.gray, c.Distance01 * .3f)))
+									EditorGUILayout.ObjectField(new GUIContent(c.Distance + ":" + c.Type.Name, c.FilePath), c.Asset, typeof(Object), false);
+								}
+							}
+							EditorGUI.indentLevel -= 1;
+						}
+						else
+						{
+							using (new GUILayout.HorizontalScope())
+							{
+								GUILayout.Space(offsetLeft);
+								EditorGUI.indentLevel += 1;
+								using (new EditorGUI.DisabledScope(true))
+									EditorGUILayout.LabelField("None found");
+								EditorGUI.indentLevel -= 1;
+							}
+						}
+					}
+					catch (ExitGUIException)
+					{
+					}
+				}
+
+				container.onGUIHandler += OnGUI;
 			}
 		}
 	}
