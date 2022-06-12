@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using UnityEditor;
 using UnityEditor.TestTools.TestRunner.UnityTestProtocol;
 using UnityEngine;
@@ -94,31 +95,47 @@ namespace Needle.ComponentExtension
 			return stage;
 		}
 
+		private static readonly Dictionary<Assembly, Type[]> types = new Dictionary<Assembly, Type[]>();
+
 		internal static void TryFindCandidatesInAssembly(string typeInfo, out List<ScriptCandidate> candidates)
 		{
 			candidates = null;
 			var parts = typeInfo.Split(',');
 			if (parts.Length < 2) return;
 			var assemblyName = parts[1].Trim();
+			// Debug.Log("---SEARCH:" + assemblyName);
 			if (string.IsNullOrWhiteSpace(assemblyName)) return;
 			var assembly = AppDomain.CurrentDomain.GetAssemblies();
+			var searchStart = DateTime.Now;
 			foreach (var asm in assembly)
 			{
 				var asmName = asm.GetName().Name;
+				if (asmName.StartsWith("System") || asmName.StartsWith("mscorlib") || asmName.StartsWith("Bee") || asmName.StartsWith("netstandard") || asmName.StartsWith("nunit") || asmName.Contains("UnityEditor") || asmName == "log4net" || asmName.Contains("Unity.Cecil") || asmName == "unityplastic" || asmName.Contains("Unity.VisualScripting") || asmName.Contains("UnityEngine.UI") || asmName.EndsWith(".Editor") || asmName.Contains("UnityEngine.TestRunner") || asmName.StartsWith("UnityEngine.CoreModule") || asmName.StartsWith("UnityEngine.IMGUI")) 
+					continue; 
 				var checkAssembly = string.Equals(asmName, assemblyName, StringComparison.CurrentCultureIgnoreCase);
 				if (!checkAssembly)
-				{ 
-					var assemblyNameDist = ComputeLevenshteinDistance(asmName, assemblyName);
-					if (assemblyNameDist < 35) checkAssembly = true;
+				{
+					if ((DateTime.Now - searchStart).TotalSeconds < 3f) 
+					{
+						var assemblyNameDist = ComputeLevenshteinDistance(asmName, assemblyName);
+						if (assemblyNameDist < 25)
+						{
+							checkAssembly = true;
+						}
+					} 
 				}
 				if (checkAssembly)
 				{
 					var scriptName = parts.FirstOrDefault()?.Trim();
-					var types = asm.GetExportedTypes();
-					foreach (var t in types)
+					if (!types.TryGetValue(asm, out var typesList))
+					{
+						typesList = asm.GetExportedTypes();
+						types.Add(asm, typesList);
+					}
+					foreach (var t in typesList)
 					{
 						var dist = ComputeLevenshteinDistance(scriptName, t.Name);
-						const int maxDist = 15;
+						const int maxDist = 10;
 						// Debug.Log(t.Name + ": " + dist + " to " + scriptName);
 						if (dist < maxDist)
 						{
@@ -129,6 +146,7 @@ namespace Needle.ComponentExtension
 								var path = AssetDatabase.GUIDToAssetPath(r);
 								if (path.EndsWith(expectedPath))
 								{
+									// Debug.Log(asmName + ": " + t);
 									candidates ??= new List<ScriptCandidate>();
 									var cand = new ScriptCandidate();
 									candidates.Add(cand);
@@ -199,7 +217,7 @@ namespace Needle.ComponentExtension
 				}
 			}
 		}
-
+		
 		private static int ComputeLevenshteinDistance(string source1, string source2)
 		{
 			var source1Length = source1.Length;

@@ -222,7 +222,10 @@ namespace Needle.ComponentExtension
 							didSearchCandidates = true;
 
 							if (!candidatesPerType.TryGetValue(typeInfo, out candidates))
+							{
 								Utils.TryFindCandidatesInAssembly(typeInfo, out candidates);
+								candidatesPerType.Add(typeInfo, candidates);
+							}
 						}
 
 						if (candidates != null && candidates.Count > 0)
@@ -234,7 +237,7 @@ namespace Needle.ComponentExtension
 								{
 									GUILayout.Space(offsetLeft);
 									// using (new GUIColorScope(Color.Lerp(Color.white, Color.gray, c.Distance01 * .3f)))
-									EditorGUILayout.ObjectField(new GUIContent(c.Distance + ":" + c.Type.Name, c.FilePath), c.Asset, typeof(Object), false);
+									EditorGUILayout.ObjectField(new GUIContent(c.Type.Name,   "Distance: " + c.Distance + "\nFullName: " + c.Type.FullName +"\nFilePath: " + c.FilePath), c.Asset, typeof(Object), false);
 								}
 							}
 							EditorGUI.indentLevel -= 1;
