@@ -30,7 +30,7 @@ namespace Needle.ComponentExtension
 		public Type Type;
 		public string FilePath;
 		public Object Asset;
-		public int Distance;
+		public float Distance;
 		public float Distance01;
 	}
 
@@ -107,6 +107,9 @@ namespace Needle.ComponentExtension
 			if (string.IsNullOrWhiteSpace(assemblyName)) return;
 			var assembly = AppDomain.CurrentDomain.GetAssemblies();
 			var searchStart = DateTime.Now;
+			var scriptName = parts.FirstOrDefault()?.Trim();
+			if (string.IsNullOrWhiteSpace(scriptName)) return;
+			var factor = (float)scriptName.Length;
 			foreach (var asm in assembly)
 			{
 				var asmName = asm.GetName().Name;
@@ -118,7 +121,7 @@ namespace Needle.ComponentExtension
 					if ((DateTime.Now - searchStart).TotalSeconds < 3f) 
 					{
 						var assemblyNameDist = ComputeLevenshteinDistance(asmName, assemblyName);
-						if (assemblyNameDist < 25)
+						if (assemblyNameDist < 33)
 						{
 							checkAssembly = true;
 						}
@@ -126,7 +129,6 @@ namespace Needle.ComponentExtension
 				}
 				if (checkAssembly)
 				{
-					var scriptName = parts.FirstOrDefault()?.Trim();
 					if (!types.TryGetValue(asm, out var typesList))
 					{
 						typesList = asm.GetExportedTypes();
@@ -134,8 +136,8 @@ namespace Needle.ComponentExtension
 					}
 					foreach (var t in typesList)
 					{
-						var dist = ComputeLevenshteinDistance(scriptName, t.Name);
-						const int maxDist = 10;
+						var dist = ComputeLevenshteinDistance(scriptName, t.Name);// / factor;
+						const float maxDist = 10;// .666f;
 						// Debug.Log(t.Name + ": " + dist + " to " + scriptName);
 						if (dist < maxDist)
 						{
@@ -213,7 +215,7 @@ namespace Needle.ComponentExtension
 
 				if (candidates != null)
 				{
-					candidates.Sort((a, b) => a.Distance - b.Distance);
+					candidates.Sort((a, b) => (int)(1000 * (a.Distance - b.Distance)));
 				}
 			}
 		}
@@ -240,7 +242,7 @@ namespace Needle.ComponentExtension
 			{
 			}
 
-			// Calculate rows and collumns distances
+			// Calculate rows and columns distances
 			for (var i = 1; i <= source1Length; i++)
 			{
 				for (var j = 1; j <= source2Length; j++)
