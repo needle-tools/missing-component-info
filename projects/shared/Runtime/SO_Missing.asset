@@ -1,0 +1,15 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea25da4032d236042a963b354b4eb52e, type: 3}
+  m_Name: SO_Missing
+  m_EditorClassIdentifier: MyScriptableObject, com.needle.missing-component-info-shared-assets
+    $ GlobalObjectId_V1-3-5d00d052a24698b488d2808bd539996a-11400000-0

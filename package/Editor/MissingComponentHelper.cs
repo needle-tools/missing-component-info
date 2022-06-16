@@ -1,9 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Deployment.Internal;
+using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEditor.UIElements;
+using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
@@ -37,6 +41,20 @@ namespace Needle.ComponentExtension
 		{
 			var openEditors = ActiveEditorTracker.sharedTracker.activeEditors;
 			var inspectors = InspectorWindow.GetInspectors();
+
+			if (openEditors.Length == 0)
+			{
+				foreach (var insp in inspectors)
+				{
+					if (insp.rootVisualElement.ClassListContains(InjectionClassName)) return;
+					insp.rootVisualElement.AddToClassList(InjectionClassName);
+					insp.rootVisualElement[1].Insert(2, new IMGUIContainer(){onGUIHandler = () =>
+					{
+						EditorGUILayout.LabelField("HELLO!");
+					}});   
+				}
+			}
+			
 			foreach (var ed in openEditors)
 			{
 				foreach (var ins in inspectors)
@@ -66,6 +84,7 @@ namespace Needle.ComponentExtension
 
 		private static void OnInject(Editor editor, EditorElement element)
 		{
+			if (editor.target is AssetImporter) return;
 			// capture script type and store it in the serialized property
 			var serializedObject = editor.serializedObject;
 			var prop = serializedObject.FindProperty("m_EditorClassIdentifier");
@@ -83,13 +102,12 @@ namespace Needle.ComponentExtension
 						EditorUtility.SetDirty(editor.target);
 					}
 				}
-				return;
 			}
 
 			// render missing script info
-			if (prop != null)
+			if (TryGetIdentifierIfMissing(editor, out var identifierString))
 			{
-				if (string.IsNullOrEmpty(prop.stringValue)) return;
+				if (string.IsNullOrEmpty(identifierString)) return;
 				if (style == null)
 				{
 					style = new GUIStyle(EditorStyles.helpBox);
@@ -97,10 +115,11 @@ namespace Needle.ComponentExtension
 				}
 
 				if (!icon) icon = AssetDatabase.LoadAssetAtPath<Texture>(AssetDatabase.GUIDToAssetPath("06824066cef43c446a81e7fc2ef35664"));
-				var values = prop.stringValue.Split('$');
-				var typeInfo = values[0];
+				var values = identifierString.Split('$');
+				var typeInfo = values[0]?.Trim();
 				var message = "<color=#ffcc11><b>Missing Type</b></color>: " + typeInfo;
 				var container = new IMGUIContainer();
+				// element.Insert(0, container);
 				element.Add(container);
 
 				var serializedId = values.Length > 1 ? values[1] : string.Empty;
@@ -261,6 +280,40 @@ namespace Needle.ComponentExtension
 
 				container.onGUIHandler += OnGUI;
 			}
+		}
+
+		private static bool TryGetIdentifierIfMissing(Editor editor, out string identifier)
+		{
+			if (editor.target && editor.target is AssetImporter importer)
+			{
+				var type = AssetDatabase.GetMainAssetTypeAtPath(importer.assetPath);
+				if (type == null)
+				{
+					var fileInfo = new FileInfo(importer.assetPath);
+					if (fileInfo.Length < 1024)
+					{
+						var content = File.ReadAllText(fileInfo.FullName);
+						var match = Regex.Match(content, @"m_EditorClassIdentifier: ?(?<identifier>.+\d+?)", RegexOptions.Singleline);
+						if (match.Success)
+						{
+							identifier = match.Groups["identifier"].Value?.Replace("\n", "");
+							Debug.Log(identifier);
+							return true;
+						}
+					}
+				}
+			}
+			
+			var serializedObject = editor.serializedObject;
+			var prop = serializedObject.FindProperty("m_EditorClassIdentifier");
+			if (!editor.target && prop != null)
+			{
+				identifier = prop.stringValue;
+				return true;
+			}
+			
+			identifier = null;
+			return false;
 		}
 	}
 }
