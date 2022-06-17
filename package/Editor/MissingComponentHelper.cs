@@ -113,6 +113,9 @@ namespace Needle.ComponentExtension
 
 				void OnGUI()
 				{
+					var expanded = UnityEditorInternal.InternalEditorUtility.GetIsInspectorExpanded(editor.target);
+					if (!expanded) return;
+					
 					try
 					{
 						// if (!prop.isValid) return; 
