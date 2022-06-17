@@ -226,8 +226,17 @@ namespace Needle.ComponentExtension
 
 							if (!candidatesPerType.TryGetValue(typeInfo, out candidates))
 							{
-								Utils.TryFindCandidatesInAssembly(typeInfo, out candidates);
-								candidatesPerType.Add(typeInfo, candidates);
+								try
+								{
+									Utils.TryFindCandidatesInAssembly(typeInfo, out candidates);
+									candidatesPerType.Add(typeInfo, candidates);
+								}
+								catch (Exception ex)
+								{
+									Debug.LogError("Error finding candidates for missing script. Please report here: https://github.com/needle-tools/missing-component-info/issues");
+									Debug.LogException(ex);
+									candidatesPerType.Add(typeInfo, null);
+								}
 							}
 						}
 

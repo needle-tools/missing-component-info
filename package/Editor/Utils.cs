@@ -122,7 +122,7 @@ namespace Needle.ComponentExtension
 					if ((DateTime.Now - searchStart).TotalSeconds < 3f) 
 					{
 						var assemblyNameDist = ComputeLevenshteinDistance(asmName, assemblyName);
-						if (assemblyNameDist < 33)
+						if (assemblyNameDist < 50)
 						{
 							checkAssembly = true;
 						}
@@ -132,9 +132,17 @@ namespace Needle.ComponentExtension
 				{
 					if (!types.TryGetValue(asm, out var typesList))
 					{
-						typesList = asm.GetExportedTypes();
-						types.Add(asm, typesList);
+						try
+						{
+							typesList = asm.GetExportedTypes();
+							types.Add(asm, typesList);
+						}
+						catch (NotSupportedException)
+						{
+							// ignore
+						}
 					}
+					if (typesList == null) continue;
 					foreach (var t in typesList)
 					{
 						var dist = ComputeLevenshteinDistance(scriptName, t.Name);// / factor;
