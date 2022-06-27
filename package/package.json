@@ -1,7 +1,7 @@
 {
   "displayName": "Needle Missing Component Info",
   "name": "com.needle.missing-component-info",
-  "version": "1.2.2-exp",
+  "version": "1.3.0",
   "description": "Utility that helps to reconnect when scripts/components become missing. Keeps type information per component around and can show serialized data for missing components.",
   "keywords": [
     "Editor",
