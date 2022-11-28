@@ -74,13 +74,18 @@ namespace Needle.ComponentExtension
 				if (prop != null)
 				{
 					var identifier = editor.target.GetType().AssemblyQualifiedName;
-					if (identifier != null && !prop.stringValue.StartsWith(identifier))
+					identifier = string.Join(",", identifier.Split(',').Take(2));
+
+					if (!String.IsNullOrEmpty(identifier) && (String.IsNullOrEmpty(prop.stringValue) || !prop.stringValue.StartsWith(identifier)))
 					{
-						identifier = string.Join(",", identifier.Split(',').Take(2));
 						var id = GlobalObjectId.GetGlobalObjectIdSlow(editor.target);
 						prop.stringValue = $"{identifier} $ " + id;
 						serializedObject.ApplyModifiedProperties();
 						EditorUtility.SetDirty(editor.target);
+
+						// Debug.Log("<color=green>Injected!</color>");
+					} else {
+						// Debug.Log("<color=yellow>Skipped!</color>");
 					}
 				}
 				return;
