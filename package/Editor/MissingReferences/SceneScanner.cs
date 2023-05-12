@@ -12,10 +12,18 @@ using UnityEditor.SceneManagement;
 using UnityEditor.Experimental.SceneManagement;
 #endif
 
-namespace pfc.Analysis
+namespace Needle.MissingReferences
 {
     public class SceneScanner
     {
+        [Serializable]
+        public class Options
+        {
+            public bool IncludeEmptyEvents = true;
+            public bool IncludeMissingMethods = true;
+            public bool IncludeUnsetMethods = true;
+        }
+        
         const string k_PersistentCallsSearchString = "m_PersistentCalls.m_Calls.Array.data[";
         const string k_TargetPropertyName = "m_Target";
         const string k_MethodNamePropertyName = "m_MethodName";

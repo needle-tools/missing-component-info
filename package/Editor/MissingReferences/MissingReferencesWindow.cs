@@ -3,7 +3,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityObject = UnityEngine.Object;
 
-namespace pfc.Analysis
+namespace Needle.MissingReferences
 {
     /// <summary>
     /// Scans the project for serialized references to missing (deleted) assets and other types of missing references and displays the results in an EditorWindow
@@ -45,13 +45,13 @@ namespace pfc.Analysis
         const string k_ScanButtonName = "Scan";
         const string k_MissingMethodFormat = "Missing Method: {0}";
 
-        Options m_Options = new Options();
+        SceneScanner.Options m_Options = new SceneScanner.Options();
 
         /// <summary>
         /// Scan for missing serialized references
         /// </summary>
         /// <param name="options">User-configurable options for this view</param>
-        protected abstract void Scan(Options options);
+        protected abstract void Scan(SceneScanner.Options options);
 
         protected virtual void OnGUI()
         {

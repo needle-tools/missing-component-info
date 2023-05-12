@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityObject = UnityEngine.Object;
 
-namespace pfc.Analysis
+namespace Needle.MissingReferences
 {
     /// <summary>
     /// Scans the project for serialized references to missing (deleted) assets and displays the results in an EditorWindow
@@ -47,7 +47,7 @@ namespace pfc.Analysis
                 /// <param name="unityObject">The main UnityObject for this asset</param>
                 /// <param name="path">The path to this asset, for gathering sub-assets</param>
                 /// <param name="options">User-configurable options for this view</param>
-                public AssetContainer(UnityObject unityObject, string path, Options options)
+                public AssetContainer(UnityObject unityObject, string path, SceneScanner.Options options)
                 {
                     m_Object = unityObject;
                     SceneScanner.CheckForMissingReferences(unityObject, PropertiesWithMissingReferences, options);
@@ -70,7 +70,7 @@ namespace pfc.Analysis
                     }
                 }
 
-                AssetContainer(UnityObject unityObject, Options options)
+                AssetContainer(UnityObject unityObject, SceneScanner.Options options)
                 {
                     m_Object = unityObject;
                     SceneScanner.CheckForMissingReferences(unityObject, PropertiesWithMissingReferences, options);
@@ -134,7 +134,7 @@ namespace pfc.Analysis
             /// </summary>
             /// <param name="path">The path to scan</param>
             /// <param name="options">User-configurable options for this view</param>
-            public void AddAssetAtPath(string path, Options options)
+            public void AddAssetAtPath(string path, SceneScanner.Options options)
             {
                 var asset = AssetDatabase.LoadAssetAtPath<UnityObject>(path);
 
@@ -274,7 +274,7 @@ namespace pfc.Analysis
         /// Load all assets in the AssetDatabase and check them for missing serialized references
         /// </summary>
         /// <param name="options">User-configurable options for this view</param>
-        protected override void Scan(Options options)
+        protected override void Scan(SceneScanner.Options options)
         {
             m_Scanned = true;
             m_ParentFolder.Clear();

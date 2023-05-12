@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace pfc.Analysis
+namespace Needle.MissingReferences
 {
     /// <summary>
     /// Scans all loaded scenes for references to missing (deleted) assets and other types of missing references and displays the results in an EditorWindow
@@ -31,7 +31,7 @@ namespace pfc.Analysis
         /// Scan all assets in the active scene for missing serialized references
         /// </summary>
         /// <param name="options">User-configurable options for this view</param>
-        protected override void Scan(Options options)
+        protected override void Scan(SceneScanner.Options options)
         {
             m_Scanned = true;
 

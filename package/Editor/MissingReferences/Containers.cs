@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using UnityEditor;
 using UnityEngine;
 using UnityObject = UnityEngine.Object;
 
-namespace pfc.Analysis
+namespace Needle.MissingReferences
 {
     /// <summary>
     /// Base class for asset and prefab references, so they can exist in the same list
@@ -16,15 +17,6 @@ namespace pfc.Analysis
         public abstract void Draw();
         public abstract UnityObject Object { get; }
         public abstract void SetVisibleRecursively(bool visible);
-    }
-    
-    
-    [Serializable]
-    public class Options
-    {
-        public bool IncludeEmptyEvents = true;
-        public bool IncludeMissingMethods = true;
-        public bool IncludeUnsetMethods = true;
     }
     
     /// <summary>
@@ -53,7 +45,7 @@ namespace pfc.Analysis
             /// </summary>
             /// <param name="component">The Component to scan for missing references</param>
             /// <param name="options">User-configurable options for this view</param>
-            public ComponentContainer(Component component, Options options)
+            public ComponentContainer(Component component, SceneScanner.Options options)
             {
                 m_Component = component;
                 SceneScanner.CheckForMissingReferences(component, PropertiesWithMissingReferences, options);
@@ -78,16 +70,22 @@ namespace pfc.Analysis
                 }
             }
 
+            private static PropertyInfo objectReferenceTypeString;
             public void FormatAsLog(StringBuilder target, int indentation)
             {
                 var indentationString = new string(' ', indentation * 4) + "- ";;
                 if (m_Component == null)
                     target.AppendLine(indentationString + "Missing script: ");
                 
+                if (objectReferenceTypeString == null) objectReferenceTypeString = typeof(SerializedProperty).GetProperty(nameof(objectReferenceTypeString), (BindingFlags)(-1));
                 foreach (var property in PropertiesWithMissingReferences)
                 {
                     if (property.propertyType == SerializedPropertyType.ObjectReference)
-                        target.AppendLine("    " + indentationString + $"{property.propertyPath} ({property.objectReferenceTypeString})");
+                    {
+                        // TODO can we show the GUID of a missing asset at least?
+                        // AssetDatabase.TryGetGUIDAndLocalFileIdentifier(property.objectReferenceValue, out var guid, out long _);
+                        target.AppendLine("    " + indentationString + $"{property.propertyPath} ({objectReferenceTypeString?.GetValue(property)})");
+                    }
                     else if (property.propertyType == SerializedPropertyType.ManagedReference)
                         target.AppendLine("    " + indentationString + $"{property.propertyPath} ({property.managedReferenceFullTypename})");
                     else
@@ -131,7 +129,7 @@ namespace pfc.Analysis
         /// </summary>
         /// <param name="gameObject">The GameObject to scan for missing references</param>
         /// <param name="options">User-configurable options for this view</param>
-        internal GameObjectContainer(GameObject gameObject, Options options)
+        internal GameObjectContainer(GameObject gameObject, SceneScanner.Options options)
         {
             m_GameObject = gameObject;
 
@@ -169,7 +167,7 @@ namespace pfc.Analysis
         /// </summary>
         /// <param name="gameObject">The GameObject to scan for missing references</param>
         /// <param name="options">User-configurable options for this view</param>
-        public void AddChild(GameObject gameObject, Options options)
+        public void AddChild(GameObject gameObject, SceneScanner.Options options)
         {
             var child = new GameObjectContainer(gameObject, options);
             var childCount = child.Count;
@@ -302,7 +300,7 @@ namespace pfc.Analysis
             {
                 var firstChild = Children?.FirstOrDefault()?.Object as GameObject;
                 if (firstChild)
-                    displayName = $"<{firstChild.scene.name}>";
+                    displayName = $"Scene: {firstChild.scene.name}";
             }
             target.AppendLine(indentationString + displayName);
 
