@@ -4,6 +4,10 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.4.1] - 2023-05-12
+- Fixed components getting dirtied more often than they should
+- Fixed rare exception on domain reload with EditorStyles being null
+
 ## [1.4.0] - 2023-05-12
 - Added MissingReferences tooling, originally based on SuperScience's MissingReferenceFinder
 - Added test API (`SceneScanner`) for missing references for use in TestRunner
