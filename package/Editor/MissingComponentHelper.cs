@@ -91,8 +91,17 @@ namespace Needle.ComponentExtension
 				if (string.IsNullOrEmpty(prop.stringValue)) return;
 				if (style == null)
 				{
-					style = new GUIStyle(EditorStyles.helpBox);
-					style.richText = true;
+					try
+					{
+						style = new GUIStyle(EditorStyles.helpBox);
+						style.richText = true;
+					}
+					catch
+					{
+						// ignore - seems EditorStyles.helpBox can throw an exception in some cases
+						style = null;
+						return;
+					}
 				}
 
 				if (!icon) icon = AssetDatabase.LoadAssetAtPath<Texture>(AssetDatabase.GUIDToAssetPath("06824066cef43c446a81e7fc2ef35664"));
