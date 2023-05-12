@@ -24,13 +24,6 @@ namespace Needle.ComponentExtension
 			UpdateInspector();
 		}
 
-		// private static void OnFocusChanged(bool obj)
-		// {
-		// 	if (obj)
-		// 		UpdateInspector();
-		// }
-
-
 		private const string InjectionClassName = "__needle_missingcomponent_helper";
 
 		private static void UpdateInspector()
@@ -73,15 +66,21 @@ namespace Needle.ComponentExtension
 			{
 				if (prop != null)
 				{
-					var identifier = editor.target.GetType().AssemblyQualifiedName;
-					if (identifier != null && !prop.stringValue.StartsWith(identifier))
-					{
-						identifier = string.Join(",", identifier.Split(',').Take(2));
-						var id = GlobalObjectId.GetGlobalObjectIdSlow(editor.target);
-						prop.stringValue = $"{identifier} $ " + id;
-						serializedObject.ApplyModifiedProperties();
-						EditorUtility.SetDirty(editor.target);
-					}
+					var type = editor.target.GetType();
+					
+					var fullName = type.FullName;
+					if (fullName == null || prop.stringValue.StartsWith(fullName))
+						return;
+					
+					var identifier = type.AssemblyQualifiedName;
+					if (identifier == null)
+						return;
+					
+					identifier = string.Join(",", identifier.Split(',').Take(2));
+					var id = GlobalObjectId.GetGlobalObjectIdSlow(editor.target);
+					prop.stringValue = $"{identifier} $ " + id;
+					serializedObject.ApplyModifiedProperties();
+					EditorUtility.SetDirty(editor.target);
 				}
 				return;
 			}
@@ -170,7 +169,7 @@ namespace Needle.ComponentExtension
 							triedCollectingMembers = true;
 							Utils.CollectMembersInfo(editor.target, serializedId, serializedObject, out members);
 						}
-						;
+						
 						if (members != null && members.Count > 0)
 						{
 							EditorGUI.indentLevel += 1;
