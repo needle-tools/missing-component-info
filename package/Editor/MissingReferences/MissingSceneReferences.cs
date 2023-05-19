@@ -40,7 +40,9 @@ namespace Needle.MissingReferences
 
             var missing = scanner.MissingReferences;
 
-            allMissingReferences = missing.ToLookup(x => x.Object.GetInstanceID());
+            allMissingReferences = missing
+                .Where(x => x.Object)
+                .ToLookup(x => x.Object.GetInstanceID());
 
             foreach (var reference in missing)
             {

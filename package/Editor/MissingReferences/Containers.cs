@@ -36,6 +36,7 @@ namespace Needle.MissingReferences
             const string k_MissingScriptLabel = "<color=red>Missing Script!</color>";
 
             readonly Component m_Component;
+            readonly string m_NameOverride;
             public readonly List<SerializedProperty> PropertiesWithMissingReferences = new List<SerializedProperty>();
 
             /// <summary>
@@ -51,16 +52,28 @@ namespace Needle.MissingReferences
                 SceneScanner.CheckForMissingReferences(component, PropertiesWithMissingReferences, options);
             }
 
+            public ComponentContainer(SerializedObject serializedObject, SceneScanner.Options options)
+            {
+                if (serializedObject == null || !serializedObject.targetObject) return;
+                
+                m_NameOverride = serializedObject.targetObject.name;
+                SceneScanner.CheckForMissingReferences(serializedObject, PropertiesWithMissingReferences, options);
+            }
+
             /// <summary>
             /// Draw the missing references UI for this component
             /// </summary>
             public void Draw()
             {
-                EditorGUILayout.ObjectField(m_Component, typeof(Component), false);
+                if (m_NameOverride != null)
+                    EditorGUILayout.LabelField(m_NameOverride);
+                else
+                    EditorGUILayout.ObjectField(m_Component, typeof(Component), false);
+                
                 using (new EditorGUI.IndentLevelScope())
                 {
                     // If the component equates to null, it is an empty scripting wrapper, indicating a missing script
-                    if (m_Component == null)
+                    if (m_Component == null && m_NameOverride == null)
                     {
                         EditorGUILayout.LabelField(k_MissingScriptLabel, MissingReferencesWindow.Styles.RichTextLabel);
                         return;
@@ -74,8 +87,10 @@ namespace Needle.MissingReferences
             public void FormatAsLog(StringBuilder target, int indentation)
             {
                 var indentationString = new string(' ', indentation * 4) + "- ";;
-                if (m_Component == null)
-                    target.AppendLine(indentationString + "Missing script: ");
+                if (m_NameOverride != null)
+                    target.AppendLine(indentationString + m_NameOverride + ":");
+                else if (m_Component == null)
+                    target.AppendLine(indentationString + "Missing script:");
                 
                 if (objectReferenceTypeString == null) objectReferenceTypeString = typeof(SerializedProperty).GetProperty(nameof(objectReferenceTypeString), (BindingFlags)(-1));
                 foreach (var property in PropertiesWithMissingReferences)
@@ -100,7 +115,7 @@ namespace Needle.MissingReferences
         const string k_LabelFormat = "{0}: {1}";
         const string k_ComponentsGroupLabelFormat = "Components: {0}";
         const string k_ChildrenGroupLabelFormat = "Children: {0}";
-
+        
         readonly GameObject m_GameObject;
         readonly List<GameObjectContainer> m_Children = new List<GameObjectContainer>();
         readonly List<ComponentContainer> m_Components = new List<ComponentContainer>();
@@ -185,6 +200,23 @@ namespace Needle.MissingReferences
                 m_Children.Add(child);
         }
 
+        public void CheckRenderSettings(SceneScanner.Options options)
+        {
+            var GetRenderSettings = typeof(RenderSettings).GetMethod("GetRenderSettings", (BindingFlags)(-1));
+            if (GetRenderSettings == null) return;
+            
+            var so = new SerializedObject(GetRenderSettings.Invoke(null, null) as RenderSettings);
+            var container = new ComponentContainer(so, options);
+            
+            var count = container.PropertiesWithMissingReferences.Count;
+            if (count > 0)
+            {
+                Count += count;
+                m_MissingReferencesInComponents += count;
+                m_Components.Add(container);
+            }
+        }
+
         /// <summary>
         /// Draw missing reference information for this GameObjectContainer
         /// </summary>
@@ -221,16 +253,11 @@ namespace Needle.MissingReferences
 
             using (new EditorGUI.IndentLevelScope())
             {
-                // If m_GameObject is null, this is a scene
-                if (m_GameObject == null)
-                {
-                    DrawChildren();
-                    return;
-                }
-
                 if (m_MissingReferencesInComponents > 0)
                 {
-                    EditorGUILayout.ObjectField(m_GameObject, typeof(GameObject), true);
+                    if (m_GameObject != null)
+                        EditorGUILayout.ObjectField(m_GameObject, typeof(GameObject), true);
+                    
                     label = string.Format(k_ComponentsGroupLabelFormat, m_MissingReferencesInComponents);
                     m_ShowComponents = EditorGUILayout.Foldout(m_ShowComponents, label, true);
                     if (m_ShowComponents)
@@ -243,6 +270,13 @@ namespace Needle.MissingReferences
                             }
                         }
                     }
+                }
+                
+                // If m_GameObject is null, this is a scene
+                if (m_GameObject == null)
+                {
+                    DrawChildren();
+                    return;
                 }
 
                 if (m_MissingReferencesInChildren > 0)
@@ -265,7 +299,7 @@ namespace Needle.MissingReferences
                 {
                     var childObject = child.m_GameObject;
 
-                    // Check for null in case  of destroyed object
+                    // Check for null in case of destroyed object
                     if (childObject)
                         child.Draw();
                 }

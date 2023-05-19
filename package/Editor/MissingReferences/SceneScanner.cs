@@ -75,6 +75,8 @@ namespace Needle.MissingReferences
 
             foreach (var kvp in m_SceneRoots)
             {
+                if (kvp.Value.HasMissingReferences)
+                    allMissingReferencesContainers.Add(kvp.Value);
                 AddToList(allMissingReferencesContainers, kvp.Value);
             }
 
@@ -89,6 +91,8 @@ namespace Needle.MissingReferences
                 rootObjectContainer.AddChild(gameObject, options);
             }
 
+            rootObjectContainer.CheckRenderSettings(options);
+            
             if (rootObjectContainer.Count > 0)
             {
                 var sceneName = scene.name;
@@ -97,6 +101,7 @@ namespace Needle.MissingReferences
 
                 m_SceneRoots.Add(new KeyValuePair<string, GameObjectContainer>(sceneName, rootObjectContainer));
             }
+            
         }
         
         /// <summary>
@@ -112,6 +117,19 @@ namespace Needle.MissingReferences
                 return;
 
             var property = new SerializedObject(obj).GetIterator();
+            while (property.NextVisible(true)) // enterChildren = true to scan all properties
+            {
+                if (CheckForMissingReferences(property, options))
+                    properties.Add(property.Copy()); // Use a copy of this property because we are iterating on it
+            }
+        }
+        
+        public static void CheckForMissingReferences(SerializedObject obj, List<SerializedProperty> properties, Options options)
+        {
+            if (obj == null)
+                return;
+
+            var property = obj.GetIterator();
             while (property.NextVisible(true)) // enterChildren = true to scan all properties
             {
                 if (CheckForMissingReferences(property, options))
