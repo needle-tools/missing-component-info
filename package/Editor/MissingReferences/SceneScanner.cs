@@ -92,6 +92,7 @@ namespace Needle.MissingReferences
             }
 
             rootObjectContainer.CheckRenderSettings(options);
+            rootObjectContainer.CheckLightingSettings(options);
             
             if (rootObjectContainer.Count > 0)
             {

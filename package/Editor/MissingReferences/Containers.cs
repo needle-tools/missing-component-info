@@ -217,6 +217,23 @@ namespace Needle.MissingReferences
             }
         }
 
+        public void CheckLightingSettings(SceneScanner.Options options)
+        {
+            var GetLightmapSettings = typeof(LightmapEditorSettings).GetMethod("GetLightmapSettings", (BindingFlags)(-1));
+            if (GetLightmapSettings == null) return;
+            
+            var so = new SerializedObject(GetLightmapSettings.Invoke(null, null) as UnityObject);
+            var container = new ComponentContainer(so, options);
+            
+            var count = container.PropertiesWithMissingReferences.Count;
+            if (count > 0)
+            {
+                Count += count;
+                m_MissingReferencesInComponents += count;
+                m_Components.Add(container);
+            }
+        }
+
         /// <summary>
         /// Draw missing reference information for this GameObjectContainer
         /// </summary>
