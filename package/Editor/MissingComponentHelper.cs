@@ -78,6 +78,12 @@ namespace Needle.ComponentExtension
 					
 					identifier = string.Join(",", identifier.Split(',').Take(2));
 					var id = GlobalObjectId.GetGlobalObjectIdSlow(editor.target);
+					// Prevent serializing invalid asset guids
+					// see https://github.com/needle-tools/missing-component-info/issues/4
+					if (id.assetGUID.ToString().StartsWith("0000000000"))
+					{
+						return;
+					}
 					prop.stringValue = $"{identifier} $ " + id;
 					serializedObject.ApplyModifiedProperties();
 					EditorUtility.SetDirty(editor.target);
