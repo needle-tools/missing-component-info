@@ -11,6 +11,7 @@ namespace Needle
 		{
 			var gos = Resources.FindObjectsOfTypeAll<GameObject>();
 			var comps = new List<Component>();
+			var previouslyHidden = new List<GameObject>();
 			foreach (var go in gos)
 			{
 				comps.Clear();
@@ -19,9 +20,19 @@ namespace Needle
 				{
 					if (comp == null)
 					{
+						previouslyHidden.Add(go);
 						go.hideFlags = HideFlags.None;
 					}
 				}
+			}
+			// Select and log the objects that were hidden
+			if (previouslyHidden.Count > 0)
+			{
+				// ReSharper disable once CoVariantArrayConversion
+				Selection.objects = previouslyHidden.ToArray();
+				Debug.Log(
+					$"Found {previouslyHidden.Count} hidden objects with missing scripts:\n" +
+					$"{string.Join("\n", previouslyHidden.ConvertAll(go => go.name).ToArray())}");
 			}
 		}
 	}
