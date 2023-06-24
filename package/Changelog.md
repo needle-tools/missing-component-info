@@ -4,6 +4,10 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.5.1] - 2023-06-24
+- Change: Prevent serializing missing asset guid
+- Change: Improve `Find Hidden Objects With Missing Scripts` menu item by selecting previously missing objects and logging object names
+
 ## [1.5.0] - 2023-06-07
 - Add check for missing references in RenderSettings
 - Add check for missing references in Lighting/LightmapSettings
