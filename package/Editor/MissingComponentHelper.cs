@@ -77,14 +77,14 @@ namespace Needle.ComponentExtension
 						return;
 					
 					identifier = string.Join(",", identifier.Split(',').Take(2));
-					var id = GlobalObjectId.GetGlobalObjectIdSlow(editor.target);
-					// Prevent serializing invalid asset guids
-					// see https://github.com/needle-tools/missing-component-info/issues/4
-					if (id.assetGUID.ToString().StartsWith("0000000000"))
-					{
-						return;
-					}
-					prop.stringValue = $"{identifier} $ " + id;
+					// var id = GlobalObjectId.GetGlobalObjectIdSlow(editor.target);
+					// // Prevent serializing invalid asset guids
+					// // see https://github.com/needle-tools/missing-component-info/issues/4
+					// if (id.assetGUID.ToString().StartsWith("0000000000"))
+					// {
+					// 	return;
+					// }
+					prop.stringValue = $"{identifier}";//" $ " + id;
 					serializedObject.ApplyModifiedProperties();
 					EditorUtility.SetDirty(editor.target);
 				}
@@ -142,8 +142,11 @@ namespace Needle.ComponentExtension
 								style);
 							GUILayout.Space(3);
 						}
-
-						if (Utils.CanShowProperties(editor.target))
+						
+						// Since 1.6.0 we removed using Unity's GlobalObjectId because it returns a different Id depending on the context
+						// and we most likely don't really need this feature anyways.
+						// See https://github.com/needle-tools/missing-component-info/issues/4 for context
+						if (Utils.CanShowProperties(editor.target) && !string.IsNullOrEmpty(serializedId))
 							RenderSerializedProperties();
 						
 						GUILayout.Space(5);
