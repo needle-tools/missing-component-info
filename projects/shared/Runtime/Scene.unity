@@ -104,7 +104,7 @@ NavMeshSettings:
   serializedVersion: 2
   m_ObjectHideFlags: 0
   m_BuildSettings:
-    serializedVersion: 2
+    serializedVersion: 3
     agentTypeID: 0
     agentRadius: 0.5
     agentHeight: 2
@@ -117,7 +117,7 @@ NavMeshSettings:
     cellSize: 0.16666667
     manualTileSize: 0
     tileSize: 256
-    accuratePlacement: 0
+    buildHeightMesh: 0
     maxJobWorkers: 0
     preserveTilesOutsideBounds: 0
     debug:
@@ -128,7 +128,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 2
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 7034211870898048076, guid: b77847a491b7bee4280f26b07259c8ff, type: 3}
@@ -180,7 +180,9 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b77847a491b7bee4280f26b07259c8ff, type: 3}
 --- !u!1 &533052731
 GameObject:
@@ -359,10 +361,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 1878741849}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d01914368017764a8dc4f084b93d88c, type: 3}
+  m_Script: {fileID: 11500000, guid: 7b4d9c98c950d5a4589c9131b00f01b3, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: MyScript, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-    PublicKeyToken=null
+  m_EditorClassIdentifier: MyScriptWithProperties123, com.needle.missing-component-info-shared-assets
+  MyFloatValue: 42
+  MyText: Hello
+  MyBool: 0
+  MyClass:
+    MyBool: 0
+  MyList: 
 --- !u!4 &1878741851
 Transform:
   m_ObjectHideFlags: 0
@@ -387,15 +394,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 1878741849}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: 7b4d9c98c950d5a4589c9131b00f01b3, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: MyScriptWithProperties, Assembly-CSharp $ GlobalObjectId_V1-2-4a0096b637f52bc4fbfb2ce6d226d132-1878741852-0
+  m_EditorClassIdentifier: MyScriptWithProperties123, com.needle.missing-component-info-shared-assets
   MyFloatValue: 42
   MyText: Hello
   MyBool: 0
   MyClass:
     MyBool: 0
-  MyList: e8030000
+  MyList: 
 --- !u!114 &1878741853
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -405,15 +412,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 1878741849}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 90bf983e5d88dae48874eff973b5a214, type: 3}
+  m_Script: {fileID: 11500000, guid: 7b4d9c98c950d5a4589c9131b00f01b3, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: MyScriptWithProperties, Assembly-CSharp $ GlobalObjectId_V1-2-4a0096b637f52bc4fbfb2ce6d226d132-1878741853-0
+  m_EditorClassIdentifier: MyScriptWithProperties123, com.needle.missing-component-info-shared-assets
   MyFloatValue: 100
-  MyText: World
-  MyBool: 1
+  MyText: test
+  MyBool: 0
   MyClass:
-    MyBool: 1
-  MyList: 010000000200000003000000
+    MyBool: 0
+  MyList: 
 --- !u!1 &1913867817
 GameObject:
   m_ObjectHideFlags: 0
