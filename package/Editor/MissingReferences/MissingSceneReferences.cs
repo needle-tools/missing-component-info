@@ -2,6 +2,11 @@
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+#if UNITY_6000_4_OR_NEWER
+using ObjectId = UnityEngine.EntityId;
+#else
+using ObjectId = System.Int32;
+#endif
 
 namespace Needle.MissingReferences
 {
@@ -42,7 +47,7 @@ namespace Needle.MissingReferences
 
             allMissingReferences = missing
                 .Where(x => x.Object)
-                .ToLookup(x => x.Object.GetInstanceID());
+                .ToLookup(x => GetId(x.Object));
 
             foreach (var reference in missing)
             {
@@ -52,7 +57,16 @@ namespace Needle.MissingReferences
             EditorApplication.RepaintHierarchyWindow();
         }
 
-        private ILookup<int, GameObjectContainer> allMissingReferences;
+        private ILookup<ObjectId, GameObjectContainer> allMissingReferences;
+
+        private static ObjectId GetId(UnityEngine.Object obj)
+        {
+#if UNITY_6000_4_OR_NEWER
+            return obj.GetEntityId();
+#else
+            return obj.GetInstanceID();
+#endif
+        }
         
         protected override void OnGUI()
         {
@@ -83,20 +97,28 @@ namespace Needle.MissingReferences
         
         private void OnEnable()
         {
+#if UNITY_6000_4_OR_NEWER
+            EditorApplication.hierarchyWindowItemByEntityIdOnGUI += HierarchyWindowItemOnGUI;
+#else
             EditorApplication.hierarchyWindowItemOnGUI += HierarchyWindowItemOnGUI;
+#endif
             EditorApplication.RepaintHierarchyWindow();
         }
 
         private void OnDisable()
         {
+#if UNITY_6000_4_OR_NEWER
+            EditorApplication.hierarchyWindowItemByEntityIdOnGUI -= HierarchyWindowItemOnGUI;
+#else
             EditorApplication.hierarchyWindowItemOnGUI -= HierarchyWindowItemOnGUI;
+#endif
             EditorApplication.RepaintHierarchyWindow();
         }
 
-        private void HierarchyWindowItemOnGUI(int instanceId, Rect selectionRect)
+        private void HierarchyWindowItemOnGUI(ObjectId entityId, Rect selectionRect)
         {
             if (allMissingReferences == null) return;
-            if (!allMissingReferences.Contains(instanceId)) return;
+            if (!allMissingReferences.Contains(entityId)) return;
 
             DrawItem(selectionRect);
         }

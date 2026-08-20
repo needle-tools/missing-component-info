@@ -138,6 +138,21 @@ namespace Needle.MissingReferences
             }
         }
 
+        /// <summary>
+        /// True when the property still holds a reference id — a missing (deleted) target keeps its id
+        /// while objectReferenceValue resolves to null.
+        /// objectReferenceInstanceIDValue is obsolete-as-error from Unity 6000.5 on, the EntityId
+        /// counterpart exists since 6000.4.
+        /// </summary>
+        static bool HasObjectReferenceId(SerializedProperty property)
+        {
+#if UNITY_6000_4_OR_NEWER
+            return property.objectReferenceEntityIdValue != EntityId.None;
+#else
+            return property.objectReferenceInstanceIDValue != 0;
+#endif
+        }
+
         static bool CheckForMissingReferences(SerializedProperty property, Options options)
         {
             var propertyPath = property.propertyPath;
@@ -169,7 +184,7 @@ namespace Needle.MissingReferences
                             if (targetProperty.objectReferenceValue == null)
                             {
                                 // If the target is a missing reference it will be caught below
-                                if (targetProperty.objectReferenceInstanceIDValue != 0)
+                                if (HasObjectReferenceId(targetProperty))
                                     return false;
 
                                 return includeEmptyEvents;
@@ -204,10 +219,10 @@ namespace Needle.MissingReferences
                 case SerializedPropertyType.ObjectReference:
                     // Some references may be null, which is to be expected--not every field is set
                     // Valid asset references will have a non-null objectReferenceValue
-                    // Valid asset references will have some non-zero objectReferenceInstanceIDValue value
+                    // Valid asset references will have some non-zero reference id
                     // References to missing assets will have a null objectReferenceValue, but will retain
-                    // their non-zero objectReferenceInstanceIDValue
-                    if (property.objectReferenceValue == null && property.objectReferenceInstanceIDValue != 0)
+                    // their non-zero reference id
+                    if (property.objectReferenceValue == null && HasObjectReferenceId(property))
                         return true;
 
                     break;
